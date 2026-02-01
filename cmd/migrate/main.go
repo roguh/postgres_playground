@@ -15,7 +15,7 @@ import (
 
 func main() {
 	var (
-		direction = flag.String("dir", "up", "Migration direction (up/down)")
+		// direction = flag.String("dir", "up", "Migration direction (up/down)")
 		steps     = flag.Int("steps", 0, "Number of migrations to run")
 		force     = flag.Int("force", 0, "Force to specific version")
 	)

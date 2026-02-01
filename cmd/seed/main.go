@@ -320,11 +320,12 @@ func seedAssets(ctx context.Context, pool *database.Pool, count int) error {
 				manufacturer, model, firmware_version, status,
 				config, telemetry, last_seen
 			) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+			ON CONFLICT (serial_number) DO NOTHING
 		`
 		batch.Queue(query,
 			siteIDs[rand.Intn(len(siteIDs))],
 			randomMAC(),
-			fmt.Sprintf("%s%d%s", manufacturer[:3], time.Now().Unix(), rand.Intn(99999)),
+			fmt.Sprintf("%s%d%s", manufacturer, time.Now().Unix(), rand.Intn(99999)),
 			assetType,
 			manufacturer,
 			fmt.Sprintf("%s-%d", assetType, rand.Intn(9999)),
@@ -413,12 +414,11 @@ func main() {
 
 	if count > 0 {
 		log.Printf("Database already contains %d sites. Clear data first if you want to reseed.", count)
-		return
-	}
-
-	// Seed data
-	if err := seedSites(ctx, pool, 1000); err != nil {
-		log.Fatal("Failed to seed sites:", err)
+	} else {
+		// Seed data
+		if err := seedSites(ctx, pool, 1000); err != nil {
+			log.Fatal("Failed to seed sites:", err)
+		}
 	}
 
 	if err := seedAssets(ctx, pool, 100000); err != nil {
